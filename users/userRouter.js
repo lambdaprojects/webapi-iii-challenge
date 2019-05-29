@@ -72,7 +72,28 @@ router.get("/:id/posts", async (req, res) => {
   }
 });
 
-router.delete("/:id", (req, res) => {});
+router.delete("/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    if (userId) {
+      const user = await userDB.getById(userId);
+      if (user) {
+        const deleteUser = await userDB.remove(userId);
+        res.status(200).json(deleteUser);
+      } else {
+        res.status(400).json({ Message: "Invalid user id" });
+      }
+    } else {
+      res
+        .status(404)
+        .json({ Message: "A user id is required for the delete operation" });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ Message: "There was an error while deleting the user." });
+  }
+});
 
 router.put("/:id", (req, res) => {});
 
