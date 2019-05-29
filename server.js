@@ -17,7 +17,9 @@ server.use("/api/posts", postRouter);
 //custom middleware
 function logger(req, res, next) {
   console.log(
-    `Request details-> [Request Type]:${req.method}, [Request URL]:${req.url} `
+    `Request details-> [Request Type]:${req.method}, [Request URL]:${
+      req.url
+    }, [Request time]:${new Date().toUTCString()} `
   );
   next();
 }
