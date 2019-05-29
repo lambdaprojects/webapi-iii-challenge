@@ -37,27 +37,19 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", validateUserId, async (req, res) => {
   try {
-    console.log(`:: REQUEST PARAMS ID IS :: ${req.params.id}`);
-    const user = await userDB.getById(req.params.id);
-    if (user) {
-      res.status(200).json(user);
-    } else {
-      res.status(400).json({ Message: "The user id is not valid." });
-    }
-  } catch {
-    console.log(`:: ERROR IN GET USER WITH ID :: ${error}`);
+    res.status(200).json(req.user);
+  } catch (error) {
     res
       .status(500)
       .json({ ErrorMessage: "There was an error while retrieving the user." });
   }
 });
 
-router.get("/:id/posts", async (req, res) => {
+router.get("/:id/posts", validateUserId, async (req, res) => {
   try {
     const userPosts = await userDB.getUserPosts(req.params.id);
-    console.log(`:: USER POSTS - :: ${JSON.stringify(userPosts)}`);
     if (userPosts.length > 0) {
       res.status(200).json(userPosts);
     } else {
@@ -72,22 +64,11 @@ router.get("/:id/posts", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", validateUserId, async (req, res) => {
   try {
     const userId = req.params.id;
-    if (userId) {
-      const user = await userDB.getById(userId);
-      if (user) {
-        const deleteUser = await userDB.remove(userId);
-        res.status(200).json(deleteUser);
-      } else {
-        res.status(400).json({ Message: "Invalid user id" });
-      }
-    } else {
-      res
-        .status(404)
-        .json({ Message: "A user id is required for the delete operation" });
-    }
+    const deleteUser = await userDB.remove(userId);
+    res.status(200).json(deleteUser);
   } catch (error) {
     res
       .status(500)
@@ -95,27 +76,11 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", validateUserId, async (req, res) => {
   try {
     const userId = req.params.id;
-    if (userId) {
-      const user = await userDB.getById(userId);
-      if (user) {
-        const updateUser = await userDB.update(userId, req.body);
-        console.log(
-          `:: UPDATE USER RETURN IS :: ${JSON.stringify(updateUser)}`
-        );
-        res.status(200).json(updateUser);
-      } else {
-        res
-          .status(400)
-          .json({ Message: "There is no user associated with this user id." });
-      }
-    } else {
-      res
-        .status(404)
-        .json({ Message: "A user id is required for the update operation." });
-    }
+    const updateUser = await userDB.update(userId, req.body);
+    res.status(200).json(updateUser);
   } catch (error) {
     res
       .status(500)
@@ -125,7 +90,28 @@ router.put("/:id", async (req, res) => {
 
 //custom middleware
 
-function validateUserId(req, res, next) {}
+async function validateUserId(req, res, next) {
+  const userId = req.params.id;
+  if (userId) {
+    if (userId !== null && userId !== "" && userId !== 0) {
+      const user = await userDB.getById(userId);
+      if (user) {
+        req.user = user;
+        next();
+      } else {
+        res
+          .status(400)
+          .json({ Message: "This user does not exist in the database." });
+      }
+    } else {
+      res.status(400).json({ Message: "Not a valid user Id." });
+    }
+  } else {
+    res.status(400).json({
+      Message: "There is no user id. User id must be available in request."
+    });
+  }
+}
 
 function validateUser(req, res, next) {}
 
