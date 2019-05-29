@@ -22,14 +22,7 @@ router.get("/", async (req, res) => {
 //GET POST BY POST ID
 router.get("/:id", validatePostId, async (req, res) => {
   try {
-    //const post = await postDB.getById(req.params.id);
-    if (post) {
-      res.status(200).json(req.post);
-    } else {
-      res
-        .status(400)
-        .json({ Message: "There was no post available for that post id." });
-    }
+    res.status(200).json(req.post);
   } catch (error) {
     res.status(500).json({
       Message: "There was an error white retrieving the post for the id."
@@ -70,6 +63,7 @@ async function validatePostId(req, res, next) {
     if (req.params.id !== 0 && req.params.id !== null && req.params.id !== "") {
       const post = await postDB.getById(req.params.id);
       if (post) {
+        console.log(":: POST FOR POST ID IS ::" + JSON.stringify(post));
         req.post = post;
         next();
       } else {
@@ -84,6 +78,23 @@ async function validatePostId(req, res, next) {
     }
   } else {
     res.status(400).json({ Message: "There is no post id available." });
+  }
+}
+
+//This is a custom middleware to validate a post
+// Following are the validations:
+// 1. Validates the bod on a request to create a new post
+// 2. validate if request body is not missing else 400
+// 3. validate if the request body has the text field
+function validatePost(req, res, next) {
+  if (req.body) {
+    if (req.body.text) {
+      next();
+    } else {
+      res.status(400).json({ Message: "Missing required text field" });
+    }
+  } else {
+    res.status(400).json({ Message: "Missing post data." });
   }
 }
 
