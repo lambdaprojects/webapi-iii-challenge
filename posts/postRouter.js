@@ -43,7 +43,9 @@ router.delete("/:id", validatePostId, async (req, res) => {
 
 router.put("/:id", validatePostId, async (req, res) => {
   try {
-    console.log("temp");
+    req.body.id = req.params.id;
+    const updatePosts = await postDB.update(req.params.id, req.body);
+    res.status(200).json(updatePosts);
   } catch (error) {
     res
       .status(500)
