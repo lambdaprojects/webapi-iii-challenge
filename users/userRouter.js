@@ -22,11 +22,10 @@ router.get("/:id", async (req, res) => {
   try {
     console.log(`:: REQUEST PARAMS ID IS :: ${req.params.id}`);
     const user = await userDB.getById(req.params.id);
-    console.log(`:: REQUEST PARAMS ID IS :: ${JSON.stringify(user)}`);
     if (user) {
       res.status(200).json(user);
     } else {
-      res.status(404).json({ Message: "The user id is not valid." });
+      res.status(400).json({ Message: "The user id is not valid." });
     }
   } catch {
     console.log(`:: ERROR IN GET USER WITH ID :: ${error}`);
@@ -36,7 +35,25 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.get("/:id/posts", (req, res) => {});
+router.get("/:id/posts", async (req, res) => {
+  try {
+    const userPosts = await userDB.getUserPosts(req.params.id);
+    console.log(`:: USER POSTS - :: ${JSON.stringify(userPosts)}`);
+    if (userPosts.length > 0) {
+      res.status(200).json(userPosts);
+    } else {
+      res
+        .status(400)
+        .json({ Message: "There are no posts associated with this user." });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        Message: "There was an error while retrieving the posts for the userId."
+      });
+  }
+});
 
 router.delete("/:id", (req, res) => {});
 
