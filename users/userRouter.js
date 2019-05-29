@@ -18,7 +18,23 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", (req, res) => {});
+router.get("/:id", async (req, res) => {
+  try {
+    console.log(`:: REQUEST PARAMS ID IS :: ${req.params.id}`);
+    const user = await userDB.getById(req.params.id);
+    console.log(`:: REQUEST PARAMS ID IS :: ${JSON.stringify(user)}`);
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(404).json({ Message: "The user id is not valid." });
+    }
+  } catch {
+    console.log(`:: ERROR IN GET USER WITH ID :: ${error}`);
+    res
+      .status(500)
+      .json({ ErrorMessage: "There was an error while retrieving the user." });
+  }
+});
 
 router.get("/:id/posts", (req, res) => {});
 
