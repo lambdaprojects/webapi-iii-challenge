@@ -95,7 +95,33 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-router.put("/:id", (req, res) => {});
+router.put("/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    if (userId) {
+      const user = await userDB.getById(userId);
+      if (user) {
+        const updateUser = await userDB.update(userId, req.body);
+        console.log(
+          `:: UPDATE USER RETURN IS :: ${JSON.stringify(updateUser)}`
+        );
+        res.status(200).json(updateUser);
+      } else {
+        res
+          .status(400)
+          .json({ Message: "There is no user associated with this user id." });
+      }
+    } else {
+      res
+        .status(404)
+        .json({ Message: "A user id is required for the update operation." });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ Message: "There was an error while updating the user." });
+  }
+});
 
 //custom middleware
 
