@@ -4,7 +4,26 @@ const router = express.Router();
 
 const userDB = require("./userDb.js");
 
-router.post("/", (req, res) => {});
+router.post("/", async (req, res) => {
+  try {
+    if (!req.body) {
+      res.status(404).json({ Message: "The request body is empty" });
+    } else {
+      if (!req.body.name) {
+        res
+          .status(404)
+          .json({ Message: "The request body does not have a user name." });
+      } else {
+        const user = await userDB.insert(req.body);
+        res.status(200).json(user);
+      }
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ Message: "There was an error while inserting the user." });
+  }
+});
 
 router.post("/:id/posts", (req, res) => {});
 
@@ -47,11 +66,9 @@ router.get("/:id/posts", async (req, res) => {
         .json({ Message: "There are no posts associated with this user." });
     }
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        Message: "There was an error while retrieving the posts for the userId."
-      });
+    res.status(500).json({
+      Message: "There was an error while retrieving the posts for the userId."
+    });
   }
 });
 
