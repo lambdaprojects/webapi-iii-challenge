@@ -88,7 +88,13 @@ router.put("/:id", validateUserId, async (req, res) => {
   }
 });
 
-//custom middleware
+// custom middleware
+
+// This is a custom middleware to test if the userId is valid.
+// Following are the validations:
+// 1. Is the id available in params
+// 2. Is the id not null or 0 or ''
+// 3. Is the id available in the database
 
 async function validateUserId(req, res, next) {
   const userId = req.params.id;
