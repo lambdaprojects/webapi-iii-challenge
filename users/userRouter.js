@@ -18,7 +18,7 @@ router.post("/", validateUser, async (req, res) => {
 });
 
 //ADD A POST ASSOCIATED TO A USER
-router.post("/:id/posts", validatePostId, validatePost, async (req, res) => {
+router.post("/:id/posts", validateUserId, validatePost, async (req, res) => {
   try {
     const userId = req.params.id;
     req.body.user_id = userId;
