@@ -3,7 +3,9 @@ const express = require("express");
 const router = express.Router();
 
 const userDB = require("./userDb.js");
+const postDB = require("../posts/postDb.js");
 
+// ADD A USER
 router.post("/", validateUser, async (req, res) => {
   try {
     const user = await userDB.insert(req.body);
@@ -15,8 +17,10 @@ router.post("/", validateUser, async (req, res) => {
   }
 });
 
+//ADD A POST ASSOCIATED TO A USER
 router.post("/:id/posts", (req, res) => {});
 
+//GET ALL THE USERS
 router.get("/", async (req, res) => {
   try {
     const users = await userDB.get();
@@ -27,6 +31,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+//GET THE USER BY ID
 router.get("/:id", validateUserId, async (req, res) => {
   try {
     res.status(200).json(req.user);
@@ -37,6 +42,7 @@ router.get("/:id", validateUserId, async (req, res) => {
   }
 });
 
+//GET THE POSTS OF A PARTICULAR USER BY THE USER ID
 router.get("/:id/posts", validateUserId, async (req, res) => {
   try {
     const userPosts = await userDB.getUserPosts(req.params.id);
@@ -54,6 +60,7 @@ router.get("/:id/posts", validateUserId, async (req, res) => {
   }
 });
 
+//DELETE A PARTICULAR USER BY ID
 router.delete("/:id", validateUserId, async (req, res) => {
   try {
     const userId = req.params.id;
@@ -66,6 +73,7 @@ router.delete("/:id", validateUserId, async (req, res) => {
   }
 });
 
+//UPDATE A USER
 router.put("/:id", validateUserId, validateUser, async (req, res) => {
   try {
     const userId = req.params.id;
