@@ -4,20 +4,10 @@ const router = express.Router();
 
 const userDB = require("./userDb.js");
 
-router.post("/", async (req, res) => {
+router.post("/", validateUser, async (req, res) => {
   try {
-    if (!req.body) {
-      res.status(404).json({ Message: "The request body is empty" });
-    } else {
-      if (!req.body.name) {
-        res
-          .status(404)
-          .json({ Message: "The request body does not have a user name." });
-      } else {
-        const user = await userDB.insert(req.body);
-        res.status(200).json(user);
-      }
-    }
+    const user = await userDB.insert(req.body);
+    res.status(200).json(user);
   } catch (error) {
     res
       .status(500)
@@ -76,7 +66,7 @@ router.delete("/:id", validateUserId, async (req, res) => {
   }
 });
 
-router.put("/:id", validateUserId, async (req, res) => {
+router.put("/:id", validateUserId, validateUser, async (req, res) => {
   try {
     const userId = req.params.id;
     const updateUser = await userDB.update(userId, req.body);
@@ -119,7 +109,22 @@ async function validateUserId(req, res, next) {
   }
 }
 
-function validateUser(req, res, next) {}
+//This is a custom middleware to validate the user
+// Following are the validations:
+// 1. validates the body on a request to create a new user
+// 2. Validate if request body is not missing else 400
+// 3. Validate if the request body has the name field
+function validateUser(req, res, next) {
+  if (req.body) {
+    if (req.body.name) {
+      next();
+    } else {
+      res.status(400).json({ Message: "Missing required name field" });
+    }
+  } else {
+    res.status(400).json({ Message: "Missing user data." });
+  }
+}
 
 function validatePost(req, res, next) {}
 
