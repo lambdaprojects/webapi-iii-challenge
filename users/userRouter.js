@@ -65,7 +65,7 @@ router.delete("/:id", validateUserId, async (req, res) => {
   try {
     const userId = req.params.id;
     const deleteUser = await userDB.remove(userId);
-    res.status(200).json(deleteUser);
+    res.status(200).json({ Message: "User deleted successfully." });
   } catch (error) {
     res
       .status(500)
