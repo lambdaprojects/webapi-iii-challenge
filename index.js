@@ -1,4 +1,5 @@
 // code away!
+// This is the index file. This is where the server is invoked.
 
 const server = require("./server.js");
 
